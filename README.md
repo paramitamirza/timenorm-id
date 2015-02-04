@@ -1,5 +1,4 @@
-A library for converting natural language expressions of dates and times to
-their normalized form, based on synchronous context free grammars.
+The adaptation of TimeNorm, a library for converting natural language expressions of dates and times to their normalized form based on synchronous context free grammars, for Indonesian language.
 
 The primary entry point for most users is `TemporalExpressionParser`, which
 parses a `Temporal` from a string:
