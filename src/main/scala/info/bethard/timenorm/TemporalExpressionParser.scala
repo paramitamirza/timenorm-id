@@ -83,7 +83,7 @@ object TemporalExpressionParser {
  *        specified, the default English grammar on the classpath is used. Note that if another
  *        grammar is specified, it may be necessary to override the [[tokenize]] method.
  */
-class TemporalExpressionParser(grammarURL: URL = classOf[TemporalExpressionParser].getResource("/info/bethard/timenorm/it.grammar")) {
+class TemporalExpressionParser(grammarURL: URL = classOf[TemporalExpressionParser].getResource("/info/bethard/timenorm/id.grammar")) {
   private val logger = Logger.getLogger(this.getClass.getName)
   //private val grammarText = Source.fromURL(grammarURL, "US-ASCII").mkString
   private val grammarText = Source.fromURL(grammarURL, "UTF-8").mkString //Paramita: Italian needs UTF-8
@@ -193,7 +193,18 @@ class TemporalExpressionParser(grammarURL: URL = classOf[TemporalExpressionParse
     } else {
       Seq(word)
     }
-  }       
+  }   
+  
+  // Paramita: special function for splitting numbers in Indonesian
+  protected def tokenizeIndonesianNumber(word: String): Seq[String] = {
+    if (word.isEmpty) {
+      Seq.empty[String]
+    } else if (word.matches("^[Ss]e(belas|puluh|ratus|ribu)$")) {
+      Seq("se") ++ Seq(word.substring(2).toLowerCase)
+    } else {
+      Seq(word)
+    }
+  }    
   
   /**
    * Splits a string into tokens to be used as input for the synchronous parser.
@@ -290,6 +301,29 @@ class TemporalExpressionParser(grammarURL: URL = classOf[TemporalExpressionParse
         Seq("tutti")
       }
       /***********************************/
+      
+      /** Paramita: for Indonesian language */
+      // special case for ber-, ke-, and -nya in Indonesian
+      else if (word.matches("^[Bb]er\\w+$")) {
+        Seq("ber") ++ Seq(word.substring(3).toLowerCase)
+      }
+      else if (word.matches("^[Kk]e(se\\w+|satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan)$")) {
+        Seq("ke") ++ tokenizeIndonesianNumber(word.substring(2).toLowerCase)
+      }
+      else if (word.matches("^\\w+nya$")) {
+        Seq(word.substring(0, word.length()-3).toLowerCase) ++ Seq("nya")
+      }
+      else if (word.matches("^\\w+(hari|pagi|siang|sore|malam)an$")) {
+        Seq(word.substring(0, word.length()-2).toLowerCase) ++ Seq("an")
+      }
+      else if (word.matches("^[Ss]e(belas|puluh|ratus|ribu|detik|menit|jam|hari|minggu|pekan|bulan|tahun|windu|dekade|abad|pagi|siang|sore|malam)$")) {
+        Seq("se") ++ Seq(word.substring(2).toLowerCase)
+      }
+      else if (word.matches("^Minggu$")) {
+        Seq("mingguhari")
+      }      
+      /**************************************/
+      
       // otherwise, split at all letter/non-letter boundaries
       else {
         this.letterNonLetterBoundary.split(word).toSeq.map(_.trim.toLowerCase).filterNot(_.isEmpty)

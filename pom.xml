@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>info.bethard</groupId>
-  <artifactId>timenorm</artifactId>
-  <version>0.9.1-SNAPSHOT</version>
+  <artifactId>timenorm-id</artifactId>
+  <version>0.9.2</version>
   <packaging>jar</packaging>
-  <name>Time Normalization</name>
-  <description>Converts natural language expressions of dates and times to their normalized form</description>
-  <url>https://github.com/bethard/timenorm/</url>
+  <name>Time Normalization (Indonesian)</name>
+  <description>Converts natural language expressions of dates and times in Indonesian to their normalized form</description>
+  <url>https://github.com/paramitamirza/timenorm-id/</url>
   <inceptionYear>2013</inceptionYear>
   <licenses>
     <license>
@@ -16,9 +16,9 @@
     </license>
   </licenses>
   <scm>
-    <url>git@github.com:bethard/timenorm.git</url>
-    <connection>scm:git:git@github.com:bethard/timenorm.git</connection>
-    <developerConnection>scm:git:git@github.com:bethard/timenorm.git</developerConnection>
+    <url>git@github.com:paramitamirza/timenorm-id.git</url>
+    <connection>scm:git:git@github.com:paramitamirza/timenorm-id.git</connection>
+    <developerConnection>scm:git:git@github.com:paramitamirza/timenorm-id.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
   <developers>
@@ -26,6 +26,11 @@
       <id>steven.bethard</id>
       <name>Steven Bethard</name>
       <email>steven.bethard@gmail.com</email>
+    </developer>
+    <developer>
+      <id>paramita.mirza</id>
+      <name>Paramita Mirza</name>
+      <email>paramita@fbk.eu</email>
     </developer>
   </developers>
   <ciManagement>
