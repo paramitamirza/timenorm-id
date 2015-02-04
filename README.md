@@ -26,5 +26,5 @@ The library is available on Maven central:
 
 You can also just dowload the .jar directly:
 
-http://search.maven.org/remotecontent?filepath=info/bethard/timenorm/0.9.0/timenorm-0.9.0.jar
+https://github.com/paramitamirza/timenorm-id/releases/download/timenorm-id-0.9.2/timenorm-id-0.9.2.jar
  
