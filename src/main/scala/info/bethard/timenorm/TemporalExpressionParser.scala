@@ -22,7 +22,22 @@ import info.bethard.timenorm.parse.TimeSpanSetParse
 
 import java.lang.StringBuilder;
 
+import java.io.FileWriter
+import java.io.PrintWriter
+
 object TemporalExpressionParser {
+  
+  def withPrintWriter(name:String)(f: (PrintWriter) => Any) {
+    val file = new File(name)
+    val writer = new FileWriter(file)
+    val printWriter = new PrintWriter(writer)
+    try {
+      f(printWriter)
+    }
+    finally {
+      printWriter.close()
+    }
+  }
   
   /**
    * Runs a demo of TemporalExpressionParser that reads time expressions from standard input and
@@ -38,28 +53,53 @@ object TemporalExpressionParser {
         new TemporalExpressionParser
       case Array(grammarPath) =>
         new TemporalExpressionParser(new File(grammarPath).toURI.toURL)
+      case Array(grammarPath, filePath) =>
+        new TemporalExpressionParser(new File(grammarPath).toURI.toURL)
       case _ =>
         System.err.printf("usage: %s [grammar-file]", this.getClass.getSimpleName)
         System.exit(1)
         throw new IllegalArgumentException
     }
-
-    // use the current date as an anchor
-    val now = LocalDate.now()
-    val anchor = TimeSpan.of(now.getYear, now.getMonthValue, now.getDayOfMonth)
-    System.out.printf("Assuming anchor: %s\n", anchor.timeMLValue)
-    System.out.println("Type in a time expression (or :quit to exit)")
-
-    // repeatedly prompt for a time expression and then try to parse it
-    System.out.print(">>> ")
-    for (line <- Source.stdin.getLines.takeWhile(_ != ":quit")) {
-      parser.parse(line, anchor) match {
-        case Failure(exception) =>
-          System.out.printf("Error: %s\n", exception.getMessage)
-        case Success(temporal) =>
-          System.out.println(temporal.timeMLValue)
+    
+    if (args.length > 1) {
+      //Read from file with format: start_id   timex   timex_type   anchor_value
+      //Output file (filename_normalized): start_id   timex   timex_type   normalized_value
+      val filePath = args(1)
+      withPrintWriter(filePath + "_normalized") { printWriter =>
+        for (line <- Source.fromFile(filePath).getLines()) {
+          val arr = line.split("\t").map(_.trim)
+          //System.out.println(arr(0))
+          val tmx = arr(1)
+          val anc = TimeSpan.fromTimeMLValue(arr(3))
+          
+          parser.parse(tmx, anc) match {
+            case Failure(exception) =>
+              //System.out.printf("Error: %s\n", exception.getMessage)
+              printWriter.println(arr(0) + "\t" + tmx + "\t" + arr(2) + "\t" + "FAIL")
+            case Success(temporal) =>
+              printWriter.println(arr(0) + "\t" + tmx + "\t" + arr(2) + "\t" + temporal.timeMLValue)
+          }
+          
+        }
       }
+    } else {
+      // use the current date as an anchor
+      val now = LocalDate.now()
+      val anchor = TimeSpan.of(now.getYear, now.getMonthValue, now.getDayOfMonth)
+      System.out.printf("Assuming anchor: %s\n", anchor.timeMLValue)
+      System.out.println("Type in a time expression (or :quit to exit)")
+      
+      // repeatedly prompt for a time expression and then try to parse it
       System.out.print(">>> ")
+      for (line <- Source.stdin.getLines.takeWhile(_ != ":quit")) {
+        parser.parse(line, anchor) match {
+          case Failure(exception) =>
+            System.out.printf("Error: %s\n", exception.getMessage)
+          case Success(temporal) =>
+            System.out.println(temporal.timeMLValue)
+        }
+        System.out.print(">>> ")
+      }
     }
   }
 }

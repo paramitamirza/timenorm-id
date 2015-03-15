@@ -4,7 +4,8 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 // expressions that appear in other places in the grammar but can sometimes be ignored
 // (if an expression occurs nowhere in the grammar, it does not need to be listed here)
 // ====================================================================================
-[Nil] ||| . ||| ||| 1.0
+//[Nil] ||| . ||| ||| 1.0
+[Nil] ||| , ||| ||| 1.0
 [Nil] ||| - ||| ||| 1.0
 [Nil] ||| / ||| ||| 1.0
 [Nil] ||| ( ||| ||| 1.0
@@ -282,8 +283,10 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 [FieldValue:MonthDay] ||| [FieldValue:DayOfMonth] [FieldValue:MonthOfYear] ||| [FieldValue:MonthOfYear] [FieldValue:DayOfMonth] ||| 1.0
 [FieldValue:MonthDay] ||| [FieldValue:NumericDayOfMonth] [FieldValue:MonthOfYear] ||| [FieldValue:MonthOfYear] [FieldValue:NumericDayOfMonth] ||| 1.0
 [FieldValue:MonthDay] ||| [FieldValue:NumericDayOfMonth] [FieldValue:NumericMonthOfYear] ||| [FieldValue:NumericMonthOfYear] [FieldValue:NumericDayOfMonth] ||| 1.0
-[FieldValue:MonthDay] ||| [FieldValue:DayOfWeek] [FieldValue:MonthDay] ||| [FieldValue:DayOfWeek] [FieldValue:MonthDay] ||| 1.0
-[FieldValue:MonthDay] ||| [FieldValue:DayOfWeek] , [FieldValue:MonthDay] ||| [FieldValue:DayOfWeek] [FieldValue:MonthDay] ||| 1.0
+[FieldValue:MonthDay] ||| [FieldValue:DayOfWeek] [FieldValue:NumericDayOfMonth] [FieldValue:MonthOfYear] ||| [FieldValue:MonthOfYear] [FieldValue:NumericDayOfMonth] ||| 1.0
+[FieldValue:MonthDay] ||| [FieldValue:DayOfWeek] [FieldValue:NumericDayOfMonth] [FieldValue:NumericMonthOfYear] ||| [FieldValue:NumericMonthOfYear] [FieldValue:NumericDayOfMonth] ||| 1.0
+[FieldValue:MonthDay] ||| [FieldValue:DayOfWeek] [Int:1Digit] [FieldValue:MonthOfYear] ||| [FieldValue:MonthOfYear] ( FieldValue DAY_OF_MONTH [Int:1Digit] ) ||| 1.0
+[FieldValue:MonthDay] ||| [FieldValue:DayOfWeek] [Int:2Digit] [FieldValue:MonthOfYear] ||| [FieldValue:MonthOfYear] ( FieldValue DAY_OF_MONTH [Int:2Digit] ) ||| 1.0
 
 // ===========================================================
 // combinations of time fields that don't fully specify a time
@@ -325,8 +328,6 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 [FieldValue:YearMonth] ||| [FieldValue:Year] [FieldValue:MonthOfYear] ||| [FieldValue:Year] [FieldValue:MonthOfYear] ||| 1.0
 [FieldValue:YearMonthDay] ||| [FieldValue:Year] [FieldValue:MonthDay] ||| [FieldValue:Year] [FieldValue:MonthDay] ||| 1.0
 [FieldValue:YearMonthDay] ||| [FieldValue:MonthDay] [FieldValue:Year] ||| [FieldValue:Year] [FieldValue:MonthDay] ||| 1.0
-[FieldValue:YearMonthDay] ||| [FieldValue:DayOfWeek] ( [FieldValue:MonthDay] [FieldValue:Year] ) ||| [FieldValue:Year] [FieldValue:MonthDay] ||| 1.0
-[FieldValue:YearMonthDay] ||| [FieldValue:DayOfWeek] , [FieldValue:MonthDay] [FieldValue:Year] ||| [FieldValue:Year] [FieldValue:MonthDay] ||| 1.0
 [FieldValue:Absolute] ||| [FieldValue:Year] ||| [FieldValue:Year] ||| 1.0
 [FieldValue:Absolute] ||| [FieldValue:Year] [FieldValue:QuarterOfYear] ||| [FieldValue:Year] [FieldValue:QuarterOfYear] ||| 1.0
 [FieldValue:Absolute] ||| [FieldValue:YearMonth] ||| [FieldValue:YearMonth] ||| 1.0
@@ -415,7 +416,7 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 [TimeSpan:Solo] ||| dahulu ||| Simple PAST ||| 1.0
 [TimeSpan:Solo] ||| dahulu kala ||| Simple PAST ||| 1.0
 [TimeSpan:Solo] ||| zaman dahulu kala ||| Simple PAST ||| 1.0
-[TimeSpan:Solo] ||| sebelumnya ||| Simple PAST ||| 1.0
+[TimeSpan:Solo] ||| sebelum nya ||| Simple PAST ||| 1.0
 [TimeSpan:Solo] ||| sebelum itu ||| Simple PAST ||| 1.0
 [TimeSpan:Solo] ||| baru - baru ini ||| Simple PAST ||| 1.0
 [TimeSpan:Solo] ||| akhir - akhir ini ||| Simple PAST ||| 1.0
@@ -423,6 +424,7 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 [TimeSpan:Solo] ||| beberapa waktu lalu ||| Simple PAST ||| 1.0
 [TimeSpan:Solo] ||| kemarin kemarin ||| Simple PAST ||| 1.0
 [TimeSpan:Solo] ||| saat itu ||| Simple PAST ||| 1.0
+[TimeSpan:Solo] ||| masa sebelum nya ||| Simple PAST ||| 1.0
 [TimeSpan:Solo] ||| sekarang ||| Simple PRESENT ||| 1.0
 [TimeSpan:Solo] ||| sekarang ini ||| Simple PRESENT ||| 1.0
 [TimeSpan:Solo] ||| saat ini ||| Simple PRESENT ||| 1.0
@@ -489,10 +491,13 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 [TimeSpan:AllowsThis] ||| [FieldValue:Absolute] lalu ||| FindAbsolute [FieldValue:Absolute] ||| 1.0
 [TimeSpan:AllowsThis] ||| [FieldValue:Absolute] yang lalu ||| FindAbsolute [FieldValue:Absolute] ||| 1.0
 [TimeSpan:AllowsThis] ||| [FieldValue:Absolute] kemarin ||| FindAbsolute [FieldValue:Absolute] ||| 1.0
+// e.g. "kemarin (19/11)"
+[TimeSpan:AllowsThis] ||| kemarin [FieldValue:Partial] ||| EndAtStartOf ( TimeSpan FindEnclosing PRESENT DAYS ) ( Period Simple 1 DAYS ) ||| 1.0
 // e.g. "semalam" --> "kemarin malam" 
 [TimeSpan:Regular] ||| se malam ||| FindEnclosed ( TimeSpan FindEarlier PRESENT ( FieldValue NIGHT_OF_DAY 1 ) ) ( FieldValue NIGHT_OF_DAY 1 ) ||| 1.0
 // e.g. "tiga minggu terakhir"
 [TimeSpan:AllowsThis] ||| [Period] terakhir ||| EndAtStartOf ( TimeSpan FindEnclosing PRESENT [Period] ) [Period] ||| 1.0
+[TimeSpan:AllowsThis] ||| [Period] terakhir ||| EndAtStartOf ( TimeSpan FindEnclosed PRESENT [Period] ) [Period] ||| 1.0
 // alternate interpretation: exactly [Period] earlier
 // e.g. "tahun depan"
 [TimeSpan:Regular] ||| [Period] lalu ||| MoveEarlier PRESENT [Period] ||| 1.0
@@ -515,6 +520,9 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 [TimeSpan:Regular] ||| lusa ||| StartAtEndOf ( TimeSpan FindEnclosing PRESENT DAYS ) ( Period Simple 2 DAYS ) ||| 1.0
 [TimeSpan:Regular] ||| besok lusa ||| StartAtEndOf ( TimeSpan FindEnclosing PRESENT DAYS ) ( Period Simple 2 DAYS ) ||| 1.0
 [TimeSpan:Regular] ||| esok lusa ||| StartAtEndOf ( TimeSpan FindEnclosing PRESENT DAYS ) ( Period Simple 2 DAYS ) ||| 1.0
+[TimeSpan:AllowsThis] ||| [FieldValue:Absolute] besok ||| FindAbsolute [FieldValue:Absolute] ||| 1.0
+// e.g. "besok (19/11)"
+[TimeSpan:AllowsThis] ||| besok [FieldValue:Partial] ||| StartAtEndOf ( TimeSpan FindEnclosing PRESENT DAYS ) ( Period Simple 1 DAYS ) ||| 1.0
 // e.g. "Selasa depan"
 [TimeSpan:AllowsThis] ||| [FieldValue:Partial] depan ||| FindLater PRESENT [FieldValue:Partial] ||| 1.0
 [TimeSpan:AllowsThis] ||| [FieldValue:Partial] nanti ||| FindLater PRESENT [FieldValue:Partial] ||| 1.0
@@ -560,6 +568,7 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 // ========================================================================
 // expressions that could be earlier or later (but we assume to be earlier)
 // ========================================================================
+[TimeSpan:Regular] ||| tahun sepuluhan ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 1 ) ||| 1.0
 [TimeSpan:Regular] ||| tahun duapuluhan ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 2 ) ||| 1.0
 [TimeSpan:Regular] ||| tahun tigapuluhan ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 3 ) ||| 1.0
 [TimeSpan:Regular] ||| tahun empatpuluhan ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 4 ) ||| 1.0
@@ -577,7 +586,25 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 [TimeSpan:Regular] ||| tahun delapan puluhan ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 8 ) ||| 1.0
 [TimeSpan:Regular] ||| tahun sembilan puluhan ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 9 ) ||| 1.0
 [TimeSpan:Regular] ||| ' [Int:0-99] ||| FindAtOrEarlier PRESENT ( FieldValue YEAR_OF_CENTURY [Int:0-99] ) ||| 1.0
-[TimeSpan:Regular] ||| tahun [Int] - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY ( Divide [Int] ( Int 10 ) ) ) ||| 1.0
+//[TimeSpan:Regular] ||| tahun [Int] - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY ( Int ( Divide ( Int [Int] ) ( Int 10 ) ) ) ) ||| 1.0
+[TimeSpan:Regular] ||| tahun 10 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 1 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun 20 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 2 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun 30 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 3 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun 40 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 4 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun 50 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 5 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun 60 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 6 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun 70 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 7 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun 80 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 8 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun 90 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 9 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun ' 10 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 1 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun ' 20 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 2 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun ' 30 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 3 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun ' 40 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 4 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun ' 50 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 5 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun ' 60 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 6 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun ' 70 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 7 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun ' 80 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 8 ) ||| 1.0
+[TimeSpan:Regular] ||| tahun ' 90 - an ||| FindAtOrEarlier PRESENT ( FieldValue DECADE_OF_CENTURY 9 ) ||| 1.0
 
 // ==========================================
 // expressions changing time span granularity
@@ -623,9 +650,9 @@ ROOTS [Period] [PeriodSet] [TimeSpan] [TimeSpanSet]
 [TimeSpan:Regular] ||| kurang lebih [TimeSpan:Regular] ||| WithModifier [TimeSpan:Regular] APPROX ||| 1.0
 [TimeSpan:Regular] ||| pra [TimeSpan:Regular] ||| WithModifier [TimeSpan:Regular] BEFORE ||| 1.0
 [TimeSpan:Regular] ||| pasca [TimeSpan:Regular] ||| WithModifier [TimeSpan:Regular] AFTER ||| 1.0
-[TimeSpan:Regular] ||| [TimeSpan:Regular] dan selanjutnya ||| WithModifier [TimeSpan:Regular] ON_OR_AFTER ||| 1.0
-[TimeSpan:Regular] ||| [TimeSpan:Regular] dan seterusnya ||| WithModifier [TimeSpan:Regular] ON_OR_AFTER ||| 1.0
-[TimeSpan:Regular] ||| [TimeSpan:Regular] dan sebelumnya ||| WithModifier [TimeSpan:Regular] ON_OR_BEFORE ||| 1.0
+[TimeSpan:Regular] ||| [TimeSpan:Regular] dan selanjut nya ||| WithModifier [TimeSpan:Regular] ON_OR_AFTER ||| 1.0
+[TimeSpan:Regular] ||| [TimeSpan:Regular] dan seterus nya ||| WithModifier [TimeSpan:Regular] ON_OR_AFTER ||| 1.0
+[TimeSpan:Regular] ||| [TimeSpan:Regular] dan sebelum nya ||| WithModifier [TimeSpan:Regular] ON_OR_BEFORE ||| 1.0
 
 // =============================
 // expressions of time span sets
